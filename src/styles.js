@@ -1,6 +1,16 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
+
+const outline = Platform.OS === 'web' ? { outline: '0' } : null;
 
 export default StyleSheet.create({
+  container: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 100000,
+  },
   dialog: {
     flex: 1,
     alignItems: 'center'
@@ -36,7 +46,9 @@ export default StyleSheet.create({
   },
   dialogInput: {
     height: 50,
-    fontSize: 18
+    fontSize: 18,
+    paddingBottom: 0,
+    ...outline,
   },
   dialogFooter: {
     borderTopWidth: 1,

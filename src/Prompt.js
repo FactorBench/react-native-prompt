@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import {
   Modal,
   Platform,
@@ -10,9 +10,10 @@ import {
 import styles from './styles';
 
 export default class Prompt extends Component {
-  static propTypes = {
+  /* static propTypes = {
     title: PropTypes.string.isRequired,
     visible: PropTypes.bool,
+    modal: PropTypes.bool,
     defaultValue: PropTypes.string,
     placeholder: PropTypes.string,
     onCancel: PropTypes.func.isRequired,
@@ -31,10 +32,11 @@ export default class Prompt extends Component {
     cancelButtonTextStyle: PropTypes.object,
     inputStyle: PropTypes.object,
     textInputProps: PropTypes.object,
-  };
+}; */
 
   static defaultProps = {
     visible: false,
+    modal: false,
     defaultValue: '',
     cancelText: 'Cancel',
     submitText: 'OK',
@@ -117,7 +119,7 @@ export default class Prompt extends Component {
               onChangeText={this._onChangeText}
               placeholder={placeholder}
               autoFocus={true}
-              underlineColorAndroid="white"
+              underlineColorAndroid="transparent"
               {...this.props.textInputProps} />
           </View>
           <View style={[styles.dialogFooter, { borderColor }]}>
@@ -141,7 +143,19 @@ export default class Prompt extends Component {
     );
   };
 
+  renderContainer() {
+      return (<View style={styles.container}>
+          {this._renderDialog()}
+      </View>);
+  }
+
   render() {
+    if (!this.props.visible) {
+      return null;
+    }
+    if (Platform.OS === 'web' || !this.props.modal) {
+        return this.renderContainer();
+    }
     return (
       <Modal onRequestClose={() => this.close()} transparent={true} visible={this.props.visible}>
         {this._renderDialog()}
