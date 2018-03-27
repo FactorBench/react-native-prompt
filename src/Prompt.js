@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import styles from './styles';
 
+const disabledOpacity = 0.5;
+
 export default class Prompt extends Component {
   /* static propTypes = {
     title: PropTypes.string.isRequired,
@@ -50,12 +52,16 @@ export default class Prompt extends Component {
     cancelButtonStyle: {},
     cancelButtonTextStyle: {},
     inputStyle: {},
+    shouldConfirmInput: true,
     onChangeText: () => {},
   };
 
   state = {
     value: '',
+    confirmValue: '',
     visible: false,
+    disable: true,
+    submitOpacity: disabledOpacity,
   };
 
   componentDidMount() {
@@ -67,10 +73,47 @@ export default class Prompt extends Component {
     this.setState({ visible, value:defaultValue });
   }
 
+  checkSubmit() {
+
+  }
+
   _onChangeText = (value) => {
     this.setState({ value });
     this.props.onChangeText(value);
+
+    this.props.shouldConfirm
+      ? (
+        value === this.state.confirmValue && value !== ''
+          ? (
+            this.setState({ disable: false, submitOpacity: 1 })
+          )
+          : (
+            this.setState({ disable: true, submitOpacity: disabledOpacity })
+          )
+      )
+      : (
+        value !== ''
+          ? (
+            this.setState({ disable: false, submitOpacity: 1 })
+          )
+          : (
+            this.setState({ disable: true, submitOpacity: disabledOpacity })
+          )
+    );
+
   };
+
+_onChangeConfirmText = (confirmValue) => {
+  this.setState({ confirmValue });
+
+    confirmValue === this.state.value && confirmValue !== ''
+      ? (
+        this.setState({ disable: false, submitOpacity: 1 })
+      )
+      : (
+        this.setState({ disable: true, submitOpacity: disabledOpacity })
+      );
+};
 
   _onSubmitPress = () => {
     const { value } = this.state;
@@ -89,6 +132,8 @@ export default class Prompt extends Component {
     const {
       title,
       placeholder,
+      confirmPlaceholder,
+      shouldConfirm,
       defaultValue,
       cancelText,
       submitText,
@@ -121,6 +166,16 @@ export default class Prompt extends Component {
               autoFocus={true}
               underlineColorAndroid="transparent"
               {...this.props.textInputProps} />
+          {shouldConfirm && (
+            <TextInput
+              style={[styles.dialogInput, inputStyle]}
+              defaultValue={defaultValue}
+              onChangeText={this._onChangeConfirmText}
+              placeholder={confirmPlaceholder}
+              underlineColorAndroid="transparent"
+              {...this.props.textInputProps} />
+          )}
+
           </View>
           <View style={[styles.dialogFooter, { borderColor }]}>
             <TouchableWithoutFeedback onPress={this._onCancelPress}>
@@ -130,9 +185,9 @@ export default class Prompt extends Component {
                 </Text>
               </View>
             </TouchableWithoutFeedback>
-            <TouchableWithoutFeedback onPress={this._onSubmitPress}>
+            <TouchableWithoutFeedback onPress={this._onSubmitPress} disabled={this.state.disable}>
               <View style={[styles.dialogAction, buttonStyle, submitButtonStyle]}>
-                <Text style={[styles.dialogActionText, buttonTextStyle, submitButtonTextStyle]}>
+                <Text style={[{opacity: this.state.submitOpacity}, styles.dialogActionText, buttonTextStyle, submitButtonTextStyle]}>
                   {submitText}
                 </Text>
               </View>
