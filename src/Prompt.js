@@ -64,13 +64,24 @@ export default class Prompt extends Component {
     submitOpacity: disabledOpacity,
   };
 
-  componentDidMount() {
-    this.setState({value: this.props.defaultValue});
+  componentWillMount() {
+    this.processProps(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
-    const { visible, defaultValue } = nextProps;
-    this.setState({ visible, value:defaultValue });
+    this.processProps(nextProps);
+  }
+
+  processProps(props) {
+      const { visible, defaultValue, shouldConfirm } = props;
+      const disable = !defaultValue || shouldConfirm;
+      this.setState({
+          visible,
+          disable,
+          value: defaultValue,
+          confirmValue: '',
+          submitOpacity: disable ? disabledOpacity : 1.0,
+      });
   }
 
   checkSubmit() {
